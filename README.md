@@ -15,6 +15,26 @@
 
 每份均包含简洁主流程、按需检查表、通用迭代指南、读取／表面误差／测试脚本及 Codex 展示元数据。两份脚本一致，可独立使用；建议只安装一种语言，避免重复触发。
 
+## 新增单一分析模式 / Additional single-modality skills
+
+**上面的原始中英文技能保持不变，仍然同时使用 XYZ 数值分析与可视化。** 以下是新增的两个独立技能，不覆盖原目录，只改变点云分析及相应证据闭环。
+
+| 新技能 | 点云分析方式 | 保留的重建要求 |
+|---|---|---|
+| [reconstructing-cadquery-numerically](skills/reconstructing-cadquery-numerically/SKILL.md) | 仅 XYZ／Python 数值分析；读取器不生成点云图，残差只用数值 | CAD 操作规划、S01…序列、圆角接合、STEP/STL、数值迭代、CAD 质量与装配检查 |
+| [reconstructing-cadquery-visually](skills/reconstructing-cadquery-visually/SKILL.md) | 仅观察实际点云多视图；程序只解码／校验／渲染，不做特征统计、拟合或距离优化 | 相同 CAD 操作规划、序列、圆角接合、STEP/STL、视觉迭代、CAD 质量与装配检查 |
+
+两者均支持 NPY、PLY、粘贴 XYZ，可按下方安装方法复制各自完整目录；每次明确指定技能名称，不混用两种点云分析结论。**纯数值指点云分析不看图，不取消新建 CAD 产物的渲染检查。** 纯视觉仍可计算新建 CAD 的体积、相切和干涉，但点云数值精度必须标为“未评估”，不能宣称图像相似证明满足绝对公差。原始混合版的数值精度要求见下文；视觉版以自己的检查表为准。
+
+```bash
+python skills/reconstructing-cadquery-numerically/scripts/test_workflow.py
+python skills/reconstructing-cadquery-visually/scripts/test_workflow.py
+```
+
+新技能各 7 组测试：共同覆盖格式、原坐标保留和非法输入；数值版检查无图输出及真实表面距离；视觉版检查无数值特征报告、七向渲染、CAD 重导入及加入 CAD 后点云视图不变。它们是工具回归测试，不证明代理对任意模型的重建精度。
+
+The original Chinese/English hybrid skills are unchanged. The two additional skills differ only in cloud evidence: numerical-only XYZ/Python analysis versus visual-only rendered observations. Both retain explicit CadQuery operations, junction rules, iteration, exports and CAD-quality checks. Visual-only results do not claim measured point-cloud accuracy; numerical-only still permits CAD-only output inspection, never cloud images or overlays.
+
 ## 通用误差闭环 / General refinement loop
 
 [中文迭代指南](skills/reconstructing-cadquery-from-point-clouds-zh/references/refinement.md) / [English refinement guide](skills/reconstructing-cadquery-from-point-clouds-en/references/refinement.md)

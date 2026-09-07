@@ -1,0 +1,4 @@
+interface:
+  display_name: "点云 → CadQuery（纯数值 / Numerical-only）"
+  short_description: "仅用 XYZ 与 Python 分析点云，保留序列建模、数值闭环和 CAD 检查"
+  default_prompt: "使用 $reconstructing-cadquery-numerically 仅从 XYZ 数值分析我的 NPY、PLY 或粘贴点云，不看点云图；按现有 CAD 操作与圆角接合规则输出独立序列、STEP 和验证报告。"
