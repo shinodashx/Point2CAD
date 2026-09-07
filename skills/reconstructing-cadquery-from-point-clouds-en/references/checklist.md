@@ -5,6 +5,7 @@
 - NPY: `allow_pickle=False`, real N×3; select extra columns explicitly, never automatically transpose 3×N. PLY: read x/y/z fields from ASCII/binary, ignore and record faces/colors/normals. Text: coordinate arrays or whitespace/comma XYZ rows, never `eval`.
 - Source indices are zero-based data-row/vertex indices. Reject invalid points by default; document reasons and mappings for any separate cleanup. Preserve duplicates, but also use unique-point/spatial-region statistics to avoid density bias.
 - Keep original scale and mark unknown units; declare any provisional millimeter interpretation. Record unit conversion and rigid transforms; points, model, and thresholds must share coordinates. PCA does not establish handedness/axis signs; never silently move the model using ICP to improve residuals.
+- Hash source files and normalized coordinate outputs separately. Dtype/encoding changes can change file hashes; also verify coordinate values and source-index consistency to establish that points are unchanged. Apply the same analysis standards to NPY/PLY/text, without copying partitions, dimensions, or category assumptions from another input.
 - Require wall/boundary evidence for holes; missing samples are not holes. Narrow arcs poorly constrain radii. Measure straight/bent wall thickness separately, and end faces/recesses/steps of revolved parts separately. Verify patterns/symmetry before imposing them.
 - Keep local optimization small and interpretable. Use a few constrained Sketch/Sweep/Loft sections for complex freeform shapes only when supported, labeling approximations. Do not interpolate every point or chase noise; request more sections/dimensions when needed.
 
@@ -22,12 +23,14 @@
 
 - Establish surface/key-dimension targets from units, measurement noise, and use. Point spacing is not measurement accuracy. Without a target, report measurements without claiming absolute acceptance.
 - Report N, mean, RMS, median, P95, maximum, threshold coverage, and worst source indices globally and by region. Do not delete outliers to improve scores; investigate hole walls, contact faces, and modeling errors first.
-- Default distances are one-way unsigned point→nearest triangle face, not nearest vertex or bidirectional Hausdorff. Model→scan samples help detect extra surfaces only in observed regions; label sparse/occluded regions unknown.
+- Default distances are one-way unsigned point→nearest triangle face, not nearest vertex or bidirectional Hausdorff. Reverse model-surface samples→discrete scan points are coverage diagnostics only. Report sampling method/seed, point spacing, and visible/contact/occluded regions; large distances on hidden contact faces do not alone prove geometric errors, nor excuse extra geometry in observed regions.
 - Record linear/angular tessellation settings and check convergence with finer meshes. Cross-check critical points against a Compound of STEP **Faces**, not solid-set distance that may return zero for interior points. Label subset counts; do not call them full-cloud STEP validation.
-- Fusion removes contact faces: validate component surfaces and the final fused body separately. This distinction materially changed errors in the caster reconstruction; never report only the smaller result.
+- Fusion removes contact faces: validate component surfaces and the final fused body separately, never reporting only the smaller result. Every exported variant must be valid; otherwise repair it or explicitly exclude it from delivery.
+- Check pairwise component intersection volumes even for static multi-body reconstruction. Record numerical tolerance using units/kernel precision. Zero intersection does not prove motion clearance, complete hidden structure, or manufacturability; localize, explain, and resolve positive-volume interference.
 - Rebuild in a clean process; reimport STEP to check validity, solid count, key positions, and scale. Check individual STL watertightness, winding, degeneracy, and positive volume; probe/section holes, slots, and walls.
 - `verify_surface.py` only supplies full-cloud triangle residuals and optional STEP checks. Add reverse coverage, semantic regions, STL integrity, and assembly checks separately. `--require-within-fraction` enforces only the declared surface-coverage criterion, not every quality gate.
 - Inspect actual exported CAD overall/back/section/junction views and residual distributions; use identical-camera before/after views for fillet refinement. Disclose unavailable rendering/inspection rather than using AI-generated illustrations as evidence.
+- Follow the [general refinement loop](refinement.md) for exceeded targets or systematic residuals. Revalidate all points each revision and match final file hashes on delivery; never rebuild CAD while retaining stale error reports. Numerical distances, validity, assembly checks, and visual inspection cannot substitute for one another.
 
 ## Assemblies and redesign (only when needed)
 
